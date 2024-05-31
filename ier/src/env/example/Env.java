@@ -1,4 +1,4 @@
-package example;
+package src.env.example;
 
 // Environment code for project ier
 

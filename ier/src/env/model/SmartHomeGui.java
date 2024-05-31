@@ -1,7 +1,6 @@
-package model;
+package src.env.model;
 
-import environment.SmartHomeEnvironment;
-import jason.asSyntax.Literal;
+import src.env.SmartHomeEnvironment;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -9,13 +8,9 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Observable;
-import java.util.Observer;
 
-public class SmartHomeGui implements ActionListener, ChangeListener, Observer {
+public class SmartHomeGui implements ActionListener, ChangeListener {
     private SmartHomeEnvironment environment;
-    private int timeCounter = 0;
-    private Timer timer;
     private JFrame frame;
     private JPanel topLeftPanel;
     private JPanel rightPanel;
@@ -26,7 +21,6 @@ public class SmartHomeGui implements ActionListener, ChangeListener, Observer {
     private JButton incrementButton;
     private JButton decrementButton;
     private int counter;
-    private JTextField time;
     private JTextField[] textsForDown;
 
     private JTextField[] textsForRight;
@@ -159,20 +153,6 @@ public class SmartHomeGui implements ActionListener, ChangeListener, Observer {
     public void initEast() {
         slidersForRight = new JSlider[2];
         textsForRight = new JTextField[5];
-        time = new JTextField(10);
-        time.setEditable(false);
-        time.setText(String.valueOf(timeCounter));
-        timer = new Timer(1000, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                timeCounter = (timeCounter + 1) % 25; // Növeljük a számlálót és visszaállítjuk 0-ra, ha eléri a 25-öt
-
-                time.setText(String.valueOf(timeCounter)); // Frissítjük a JTextField-t
-                environment.clearPercepts();
-                environment.addPercept(Literal.parseLiteral("time("+ timeCounter+ ")"));
-            }
-        });
-        timer.start();
         for (int i = 0; i < 2; i++) {
             slidersForRight[i] = new JSlider();
             slidersForRight[i].addChangeListener(this);
@@ -186,12 +166,10 @@ public class SmartHomeGui implements ActionListener, ChangeListener, Observer {
         textsForRight[2].setText("Weather");
         textsForRight[3].setText("Number of people");
         textsForRight[4].setText("AC working");
-
-            rightPanel.add(textsForRight[0]);
-            rightPanel.add(time);
-            rightPanel.add(textsForRight[1]);
-            rightPanel.add(slidersForRight[1]);
-
+        for (int i = 0; i < 2; i++) {
+            rightPanel.add(textsForRight[i]);
+            rightPanel.add(slidersForRight[i]);
+        }
 
         JPanel multiChoicePanel = new JPanel(new BorderLayout());
 
@@ -261,7 +239,11 @@ public class SmartHomeGui implements ActionListener, ChangeListener, Observer {
 
 
 
-
+  /*  leftLabels[3].setIcon(window_closed);
+    leftLabels[10].setIcon(curtains_closed);
+    leftLabels[27].setIcon(ac_on);
+    leftLabels[45].setIcon(door_closed);
+    leftLabels[24].setIcon(light_on);*/
     @Override
     public void actionPerformed(ActionEvent e) {
         counterListener(e);
@@ -269,15 +251,11 @@ public class SmartHomeGui implements ActionListener, ChangeListener, Observer {
         radioPanel2Listener(e);
     }
 
-
     public void counterListener(ActionEvent e){
         // Ellenőrzés, hogy melyik gomb lett megnyomva
-        if (e.getSource() == incrementButton && counter != 1) {
-            environment.addPercept(Literal.parseLiteral("Human(1)"));
+        if (e.getSource() == incrementButton) {
             counter++;
         } else if (e.getSource() == decrementButton&& counter != 0) {
-            environment.addPercept(Literal.parseLiteral("Human(0)"));
-
             counter--;
         }
         // Counter label frissítése
@@ -313,33 +291,18 @@ public void radioPanel2Listener(ActionEvent e){
 }
     @Override
     public void stateChanged(ChangeEvent e) {
+        if(e.getSource()== slidersForRight[0])
+        {
 
+
+        }
         if (e.getSource() == slidersForRight[1]){
-            int value = slidersForRight[1].getValue()/2;
-            environment.addPercept(Literal.parseLiteral("outsideTemperature("+value+")"));
+
         }
     }
     public void updateGui(){
         boolean windowState = environment.getModel().getDeviceState("window");
         leftLabels[3].setIcon(windowState ? window_open : window_closed );
     }
-
-    @Override
-    public void update(Observable o, Object arg) {
-        if (o instanceof SmartHomeModel) {
-            updateStatus();
-        }
-
-    }  /*  leftLabels[3].setIcon(window_closed);
-    leftLabels[10].setIcon(curtains_closed);
-    leftLabels[27].setIcon(ac_on);
-    leftLabels[45].setIcon(door_closed);
-    leftLabels[24].setIcon(light_on);*/
-     private void updateStatus() {
-        leftLabels[24].setIcon(environment.getModel().getDeviceState("lights_on") ? light_on : light_off);
-       /* temperatureStatus.setText(String.valueOf(model.getTemperature()));
-        windowStatus.setText(model.getDeviceState("window") ? "Open" : "Closed");
-        doorStatus.setText(model.getDeviceState("door") ? "Open" : "Closed");
-    */}
 }
 

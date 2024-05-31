@@ -12,10 +12,11 @@
 
 MAS ier {
 
-    environment: example.Env(10)
+    environment: src.env.SmartHomeEnvironment
 
     agents: bob;
             alice;
+            human;
 
     aslSourcePath: "src/agt";
 }
