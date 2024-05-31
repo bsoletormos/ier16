@@ -1,8 +1,9 @@
-package environment;
+package src.env;
 
 import jason.asSyntax.*;
 import jason.environment.*;
-import model.SmartHomeModel;
+import src.env.model.SmartHomeGui;
+import src.env.model.SmartHomeModel;
 
 import java.util.logging.Logger;
 
@@ -22,6 +23,7 @@ public class SmartHomeEnvironment extends Environment {
         super.init(args);
         model = new SmartHomeModel();
         model.addObserver((o, arg) -> updatePercepts());
+        SmartHomeGui smartHomeGui = new SmartHomeGui(this);
         logger.info("SmartHomeEnvironment initialized with args.");
     }
 public SmartHomeModel getModel() {return model;}

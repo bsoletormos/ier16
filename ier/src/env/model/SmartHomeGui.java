@@ -1,6 +1,6 @@
-package model;
+package src.env.model;
 
-import environment.SmartHomeEnvironment;
+import src.env.SmartHomeEnvironment;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
