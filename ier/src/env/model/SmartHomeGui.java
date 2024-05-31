@@ -280,7 +280,7 @@ public class SmartHomeGui implements ActionListener, ChangeListener, Observer {
     leftLabels[45].setIcon(door_closed);
     leftLabels[24].setIcon(light_on);*/
     private void updateStatus() {
-       // leftLabels[24].setIcon(environment.getModel().getDeviceState("lights_on") ? light_on : light_off);
+        leftLabels[24].setIcon(environment.getModel().getDeviceState("lights_on") ? light_on : light_off);
        /* temperatureStatus.setText(String.valueOf(model.getTemperature()));
         windowStatus.setText(model.getDeviceState("window") ? "Open" : "Closed");
         doorStatus.setText(model.getDeviceState("door") ? "Open" : "Closed");
