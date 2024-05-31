@@ -1,6 +1,6 @@
-package src.env.model;
+package model;
 
-import src.env.SmartHomeEnvironment;
+import jason.asSyntax.Literal;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -8,9 +8,14 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Observable;
+import java.util.Observer;
 
-public class SmartHomeGui implements ActionListener, ChangeListener {
-    private SmartHomeEnvironment environment;
+public class SmartHomeGui implements ActionListener, ChangeListener, Observer {
+    private static environment.SmartHomeEnvironment environment;
+    private int timeCounter = 0;
+    private Timer timer;
+    private JTextField time;
     private JFrame frame;
     private JPanel topLeftPanel;
     private JPanel rightPanel;
@@ -52,7 +57,7 @@ public class SmartHomeGui implements ActionListener, ChangeListener {
 
     private JLabel[] leftLabels;
 
-    public SmartHomeGui(SmartHomeEnvironment environment) {
+    public SmartHomeGui(environment.SmartHomeEnvironment environment) {
         // JFrame létrehozása
         frame = new JFrame("SmartHomeGUI");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -94,7 +99,7 @@ public class SmartHomeGui implements ActionListener, ChangeListener {
 
     public static void main(String[] args) {
         // GUI alkalmazás indítása
-        SmartHomeEnvironment environment = new SmartHomeEnvironment();
+        environment.SmartHomeEnvironment environment = new environment.SmartHomeEnvironment();
         environment.init(new String[]{});  // Inicializáljuk a környezetet
         new SmartHomeGui(environment);
     }
@@ -153,10 +158,19 @@ public class SmartHomeGui implements ActionListener, ChangeListener {
     public void initEast() {
         slidersForRight = new JSlider[2];
         textsForRight = new JTextField[5];
-        for (int i = 0; i < 2; i++) {
-            slidersForRight[i] = new JSlider();
-            slidersForRight[i].addChangeListener(this);
-        }
+
+        time = new JTextField(10);
+        time.setEditable(false);
+        time.setText(String.valueOf(timeCounter));
+        timer = new Timer(1000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                timeCounter = (timeCounter + 1) % 25; // Növeljük a számlálót és visszaállítjuk 0-ra, ha eléri a 25-öt
+                time.setText(String.valueOf(timeCounter)); // Frissítjük a JTextField-t
+                environment.addPercept(Literal.parseLiteral("time("+ timeCounter+ ")"));
+            }
+        });
+        timer.start();
         rightPanel = new JPanel(new GridLayout(5, 2));
         for (int i = 0; i < 5; i++) {
             textsForRight[i] = new JTextField();
@@ -170,6 +184,10 @@ public class SmartHomeGui implements ActionListener, ChangeListener {
             rightPanel.add(textsForRight[i]);
             rightPanel.add(slidersForRight[i]);
         }
+        rightPanel.add(textsForRight[0]);
+        rightPanel.add(time);
+        rightPanel.add(textsForRight[1]);
+        rightPanel.add(slidersForRight[1]);
 
         JPanel multiChoicePanel = new JPanel(new BorderLayout());
 
@@ -250,12 +268,31 @@ public class SmartHomeGui implements ActionListener, ChangeListener {
         radioPanel1Listener(e);
         radioPanel2Listener(e);
     }
+    @Override
+    public void update(Observable o, Object arg) {
+        if (o instanceof src.env.model.SmartHomeModel) {
+            updateStatus();
+        }
 
+    }  /*  leftLabels[3].setIcon(window_closed);
+    leftLabels[10].setIcon(curtains_closed);
+    leftLabels[27].setIcon(ac_on);
+    leftLabels[45].setIcon(door_closed);
+    leftLabels[24].setIcon(light_on);*/
+    private void updateStatus() {
+       // leftLabels[24].setIcon(environment.getModel().getDeviceState("lights_on") ? light_on : light_off);
+       /* temperatureStatus.setText(String.valueOf(model.getTemperature()));
+        windowStatus.setText(model.getDeviceState("window") ? "Open" : "Closed");
+        doorStatus.setText(model.getDeviceState("door") ? "Open" : "Closed");
+    */}
     public void counterListener(ActionEvent e){
         // Ellenőrzés, hogy melyik gomb lett megnyomva
-        if (e.getSource() == incrementButton) {
+        if (e.getSource() == incrementButton && counter != 1) {
+            environment.addPercept(Literal.parseLiteral("Human(1)"));
             counter++;
         } else if (e.getSource() == decrementButton&& counter != 0) {
+            environment.addPercept(Literal.parseLiteral("Human(0)"));
+
             counter--;
         }
         // Counter label frissítése
@@ -264,13 +301,11 @@ public class SmartHomeGui implements ActionListener, ChangeListener {
 public void radioPanel1Listener(ActionEvent e){
         if(e.getSource() == sunnyButton){
             environment.setRainyWeather(true);
-            System.out.println(environment.getModel().getDeviceState("window"));
 
 
         }
         if(e.getSource() == rainyButton){
             environment.setRainyWeather(false);
-            System.out.println(environment.getModel().getDeviceState("window"));
         }
         if(e.getSource() == extraWindyButton){
 
@@ -291,18 +326,10 @@ public void radioPanel2Listener(ActionEvent e){
 }
     @Override
     public void stateChanged(ChangeEvent e) {
-        if(e.getSource()== slidersForRight[0])
-        {
 
-
-        }
-        if (e.getSource() == slidersForRight[1]){
-
-        }
+        int value = slidersForRight[1].getValue()/2;
+        environment.addPercept(Literal.parseLiteral("outsideTemperature("+value+")"));
     }
-    public void updateGui(){
-        boolean windowState = environment.getModel().getDeviceState("window");
-        leftLabels[3].setIcon(windowState ? window_open : window_closed );
-    }
+
 }
 
