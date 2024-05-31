@@ -5,11 +5,12 @@ import java.util.Map;
 import java.util.Observable;
 import java.util.logging.Logger;
 
+
 public class SmartHomeModel extends Observable {
     private Map<String, Boolean> deviceStates;
     private double temperature;
     private int time;
-    private boolean rainyWeather;
+    private Weather currentWeather;
     private final Logger logger = Logger.getLogger(SmartHomeModel.class.getName());
 
     public SmartHomeModel() {
@@ -25,6 +26,7 @@ public class SmartHomeModel extends Observable {
         deviceStates.put("window", false);
         temperature = 22.0;
         time = 0;
+        currentWeather = Weather.sunny;
         logger.info("Device states initialized.");
     }
 
@@ -64,6 +66,17 @@ public class SmartHomeModel extends Observable {
         setChanged();
         notifyObservers("weather");
         logger.info("Weather set to " + (rainy ? "rainy" : "sunny"));
+    }
+
+    public void setCurrentWeather(Weather weather) {
+        this.currentWeather = weather;
+        setChanged();
+        notifyObservers("weather");
+        logger.info("Weather set to " + weather);
+    }
+
+    public Weather getCurrentWeather() {
+        return currentWeather;
     }
 
     public int getTime() {

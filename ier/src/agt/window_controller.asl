@@ -3,28 +3,64 @@
 +!start : true <- 
     .print("Window Controller started").
 
-+!set_weather(W) : 
-    W == "windy" & .my_name(Name) <- 
-    !close_window(Name);
-    !open_window(Name).
++weather(sunny)
+    <- .print("Weather is sunny, opening window")
+    ; !openWindow.
 
-+!close_window(Name) <- 
-    .send(env, tell, closeWindow(window)).
++weather(rainy)
+    <- .print("Weather is rainy, closing window")
+    ; !closeWindow.
 
-+!open_window(Name) <- 
-    .send(env, tell, openWindow(window)).
-// Esős időjárás perceptus kezelése
-+weather(rainy) : true
-  <- .print("Rain detected, closing window.");
-     !closeWindow.
++weather(windy)
+    <- .print("Weather is windy, closing window")
+    ; !closeWindow.
 
-// Terv az ablak becsukására
-+!closeWindow
-  <- .send(env, tell, closeWindow(window)).
++weather(foggy)
+    <- .print("Weather is calm, keeping window state")
+    ; !closeWindow.
 
-+weather(rainy) : false
-   <- .print("Sun is up, opening window.");
-   !openWindow.
-+!openWindow
-    <- .send(env, tell, openWindow(window)).
++weather(cloudy)
+    <- .print("Weather is calm, keeping window state")
+    ; !openWindow.
+
+ +temperature(T)
+     : T > 28
+     <- .print("Temperature is above 28, opening window")
+     ; !openWindow.
+
+ +temperature(T)
+     : T < 24
+     <- .print("Temperature is below 24, closing window")
+     ; !closeWindow.
+
++openWindow
+    <- .send(environment, tell, openWindow(window)).
+
++closeWindow
+    <- .send(environment, tell, closeWindow(window)).
+
+
+
++time(Time)
+    : (Time >= 21 ; Time < 9)
+    <- .print("Time is between 21:00 and 09:00, closing door")
+    ; !closeDoor
+    ; !closeWindow.
+
++time(Time)
+    : (Time >= 9 & Time < 21)
+    <- .print("Time is between 09:00 and 21:00, opening door")
+    ; !openDoor
+    ; !openWindow.
+
++openDoor
+    <- .send(environment, tell, openDoor(door)).
+
++closeDoor
+    <- .send(environment, tell, closeDoor(door)).
+
+
+
+
+
 

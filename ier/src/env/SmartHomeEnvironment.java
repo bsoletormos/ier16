@@ -17,6 +17,8 @@ public class SmartHomeEnvironment extends Environment {
     public static final Literal OPEN_DOOR = Literal.parseLiteral("openDoor(door)");
     public static final Literal CLOSE_DOOR = Literal.parseLiteral("closeDoor(door)");
 
+    public static final Literal SET_WEATHER = Literal.parseLiteral("setWeather(weather)");
+
     @Override
     public void init(String[] args) {
         super.init(args);
@@ -48,6 +50,11 @@ public SmartHomeModel getModel() {return model;}
                 case "closeDoor":
                     model.setDeviceState("door", false);
                     break;
+                case "setWeather":
+                    String weatherStr = action.getTerm(0).toString();
+                    Weather weather = Weather.valueOf(weatherStr.toUpperCase());
+                    setWeather(weather);
+                    break;
                 default:
                     logger.severe("Action " + act + " not supported");
                     return false;
@@ -69,7 +76,8 @@ public SmartHomeModel getModel() {return model;}
         addPercept(Literal.parseLiteral("temperature(" + model.getTemperature() + ")"));
         addPercept(Literal.parseLiteral("window(" + model.getDeviceState("window") + ")"));
         addPercept(Literal.parseLiteral("door(" + model.getDeviceState("door") + ")"));
-        addPercept(Literal.parseLiteral("weather(" + (model.isRainy() ? "rainy" : "sunny") + ")")); // Időjárás perceptus hozzáadása
+        addPercept(Literal.parseLiteral("weather(" + model.getCurrentWeather().name().toLowerCase() + ")"));
+        addPercept(Literal.parseLiteral("time(" + model.getTime() + ")"));
 
         logger.fine("Updated percepts based on the environment state.");
     }
