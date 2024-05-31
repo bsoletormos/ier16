@@ -1,6 +1,7 @@
 package model;
 
 import environment.SmartHomeEnvironment;
+import jason.asSyntax.Literal;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -11,6 +12,8 @@ import java.awt.event.ActionListener;
 
 public class SmartHomeGui implements ActionListener, ChangeListener {
     private SmartHomeEnvironment environment;
+    private int timeCounter = 0;
+    private Timer timer;
     private JFrame frame;
     private JPanel topLeftPanel;
     private JPanel rightPanel;
@@ -21,6 +24,7 @@ public class SmartHomeGui implements ActionListener, ChangeListener {
     private JButton incrementButton;
     private JButton decrementButton;
     private int counter;
+    private JTextField time;
     private JTextField[] textsForDown;
 
     private JTextField[] textsForRight;
@@ -153,6 +157,18 @@ public class SmartHomeGui implements ActionListener, ChangeListener {
     public void initEast() {
         slidersForRight = new JSlider[2];
         textsForRight = new JTextField[5];
+        time = new JTextField(10);
+        time.setEditable(false);
+        time.setText(String.valueOf(timeCounter));
+        timer = new Timer(1000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                timeCounter = (timeCounter + 1) % 25; // Növeljük a számlálót és visszaállítjuk 0-ra, ha eléri a 25-öt
+                time.setText(String.valueOf(timeCounter)); // Frissítjük a JTextField-t
+                environment.addPercept(Literal.parseLiteral("time("+ timeCounter+ ")"));
+            }
+        });
+        timer.start();
         for (int i = 0; i < 2; i++) {
             slidersForRight[i] = new JSlider();
             slidersForRight[i].addChangeListener(this);
@@ -166,10 +182,12 @@ public class SmartHomeGui implements ActionListener, ChangeListener {
         textsForRight[2].setText("Weather");
         textsForRight[3].setText("Number of people");
         textsForRight[4].setText("AC working");
-        for (int i = 0; i < 2; i++) {
-            rightPanel.add(textsForRight[i]);
-            rightPanel.add(slidersForRight[i]);
-        }
+
+            rightPanel.add(textsForRight[0]);
+            rightPanel.add(time);
+            rightPanel.add(textsForRight[1]);
+            rightPanel.add(slidersForRight[1]);
+
 
         JPanel multiChoicePanel = new JPanel(new BorderLayout());
 
@@ -251,11 +269,15 @@ public class SmartHomeGui implements ActionListener, ChangeListener {
         radioPanel2Listener(e);
     }
 
+
     public void counterListener(ActionEvent e){
         // Ellenőrzés, hogy melyik gomb lett megnyomva
-        if (e.getSource() == incrementButton) {
+        if (e.getSource() == incrementButton && counter != 1) {
+            environment.addPercept(Literal.parseLiteral("Human(1)"));
             counter++;
         } else if (e.getSource() == decrementButton&& counter != 0) {
+            environment.addPercept(Literal.parseLiteral("Human(0)"));
+
             counter--;
         }
         // Counter label frissítése
@@ -291,13 +313,10 @@ public void radioPanel2Listener(ActionEvent e){
 }
     @Override
     public void stateChanged(ChangeEvent e) {
-        if(e.getSource()== slidersForRight[0])
-        {
 
-
-        }
         if (e.getSource() == slidersForRight[1]){
-
+            int value = slidersForRight[1].getValue()/2;
+            environment.addPercept(Literal.parseLiteral("outsideTemperature("+value+")"));
         }
     }
     public void updateGui(){
