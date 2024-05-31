@@ -9,8 +9,10 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Observable;
+import java.util.Observer;
 
-public class SmartHomeGui implements ActionListener, ChangeListener {
+public class SmartHomeGui implements ActionListener, ChangeListener, Observer {
     private SmartHomeEnvironment environment;
     private int timeCounter = 0;
     private Timer timer;
@@ -164,7 +166,9 @@ public class SmartHomeGui implements ActionListener, ChangeListener {
             @Override
             public void actionPerformed(ActionEvent e) {
                 timeCounter = (timeCounter + 1) % 25; // Növeljük a számlálót és visszaállítjuk 0-ra, ha eléri a 25-öt
+
                 time.setText(String.valueOf(timeCounter)); // Frissítjük a JTextField-t
+                environment.clearPercepts();
                 environment.addPercept(Literal.parseLiteral("time("+ timeCounter+ ")"));
             }
         });
@@ -257,11 +261,7 @@ public class SmartHomeGui implements ActionListener, ChangeListener {
 
 
 
-  /*  leftLabels[3].setIcon(window_closed);
-    leftLabels[10].setIcon(curtains_closed);
-    leftLabels[27].setIcon(ac_on);
-    leftLabels[45].setIcon(door_closed);
-    leftLabels[24].setIcon(light_on);*/
+
     @Override
     public void actionPerformed(ActionEvent e) {
         counterListener(e);
@@ -323,5 +323,23 @@ public void radioPanel2Listener(ActionEvent e){
         boolean windowState = environment.getModel().getDeviceState("window");
         leftLabels[3].setIcon(windowState ? window_open : window_closed );
     }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        if (o instanceof SmartHomeModel) {
+            updateStatus();
+        }
+
+    }  /*  leftLabels[3].setIcon(window_closed);
+    leftLabels[10].setIcon(curtains_closed);
+    leftLabels[27].setIcon(ac_on);
+    leftLabels[45].setIcon(door_closed);
+    leftLabels[24].setIcon(light_on);*/
+     private void updateStatus() {
+        leftLabels[24].setIcon(environment.getModel().getDeviceState("lights_on") ? light_on : light_off);
+       /* temperatureStatus.setText(String.valueOf(model.getTemperature()));
+        windowStatus.setText(model.getDeviceState("window") ? "Open" : "Closed");
+        doorStatus.setText(model.getDeviceState("door") ? "Open" : "Closed");
+    */}
 }
 
