@@ -16,6 +16,7 @@ MAS ier {
 
     agents: bob;
             alice;
+            human;
 
     aslSourcePath: "src/agt";
 }
