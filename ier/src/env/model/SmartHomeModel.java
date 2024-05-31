@@ -1,4 +1,4 @@
-package src.env.model;
+package model;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -56,16 +56,6 @@ public class SmartHomeModel extends Observable {
         setChanged();
         notifyObservers("temperature");
         logger.info("Temperature set to " + temperature);
-    }
-    public boolean isRainy() {
-        return rainyWeather;
-    }
-
-    public void setRainy(boolean rainy) {
-        this.rainyWeather = rainy;
-        setChanged();
-        notifyObservers("weather");
-        logger.info("Weather set to " + (rainy ? "rainy" : "sunny"));
     }
 
     public void setCurrentWeather(Weather weather) {
