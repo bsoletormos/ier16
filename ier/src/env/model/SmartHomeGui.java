@@ -1,4 +1,4 @@
-package src.env.model;
+package model;
 
 import environment.SmartHomeEnvironment;
 

@@ -1,4 +1,4 @@
-package src.env.environment;
+package environment;
 
 import jason.asSyntax.*;
 import jason.environment.*;
