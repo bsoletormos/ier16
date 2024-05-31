@@ -1,6 +1,7 @@
-package model;
+package src.env.model;
 
 import jason.asSyntax.Literal;
+import src.env.SmartHomeEnvironment;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -12,7 +13,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 public class SmartHomeGui implements ActionListener, ChangeListener, Observer {
-    private static environment.SmartHomeEnvironment environment;
+    private static src.env.SmartHomeEnvironment environment;
     private int timeCounter = 0;
     private Timer timer;
     private JTextField time;
@@ -57,7 +58,7 @@ public class SmartHomeGui implements ActionListener, ChangeListener, Observer {
 
     private JLabel[] leftLabels;
 
-    public SmartHomeGui(environment.SmartHomeEnvironment environment) {
+    public SmartHomeGui(src.env.SmartHomeEnvironment environment) {
         // JFrame létrehozása
         frame = new JFrame("SmartHomeGUI");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -99,7 +100,7 @@ public class SmartHomeGui implements ActionListener, ChangeListener, Observer {
 
     public static void main(String[] args) {
         // GUI alkalmazás indítása
-        environment.SmartHomeEnvironment environment = new environment.SmartHomeEnvironment();
+        SmartHomeEnvironment environment = new SmartHomeEnvironment();
         environment.init(new String[]{});  // Inicializáljuk a környezetet
         new SmartHomeGui(environment);
     }

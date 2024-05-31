@@ -2,9 +2,9 @@ package src.env;
 
 import jason.asSyntax.*;
 import jason.environment.*;
-import src.env.SmartHomeEnvironment;
 import src.env.model.SmartHomeGui;
 import src.env.model.SmartHomeModel;
+import src.env.model.Weather;
 
 import java.util.logging.Logger;
 
@@ -56,7 +56,7 @@ public SmartHomeModel getModel() {return model;}
                 case "setWeather":
                     String weatherStr = action.getTerm(0).toString();
                     Weather weather = Weather.valueOf(weatherStr.toUpperCase());
-                    setWeather(weather);
+                    //setWeather(weather);
                     break;
                 default:
                     logger.severe("Action " + act + " not supported");
@@ -70,7 +70,7 @@ public SmartHomeModel getModel() {return model;}
         }
     }
     public void setRainyWeather(boolean isRainy) {
-        model.setRainy(isRainy);
+        //model.setRainy(isRainy);
         updatePercepts(); // Frissítjük a perceptusokat az időjárás változása után
     }
     public void updatePercepts() {
